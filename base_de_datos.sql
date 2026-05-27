@@ -43,3 +43,14 @@ INSERT INTO productos (nombre_producto, categoria_id, stock, precio) VALUES
 -- UPDATE productos SET precio = 720.00, stock = 15 WHERE id = 1;
 -- Eliminación de producto descontinuado:
 -- DELETE FROM productos WHERE id = 4;
+
+--guia practica 11
+
+-- REPORTES RELACIONALES AVANZADOS (Guía 11)
+-- 1. Vista completa del inventario con categorías legibles para administración:
+SELECT p.id, p.nombre_producto, c.nombre_categoria, p.stock, p.precio FROM productos p
+INNER JOIN categorias c ON p.categoria_id = c.id;
+
+-- 2. Vista filtrada exclusivamente para el departamento de 'Accesorios':
+SELECT p.id, p.nombre_producto, c.nombre_categoria, p.stock, p.precio FROM productos p
+INNER JOIN categorias c ON p.categoria_id = c.id WHERE c.nombre_categoria = 'Accesorios';
