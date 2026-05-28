@@ -54,3 +54,20 @@ INNER JOIN categorias c ON p.categoria_id = c.id;
 -- 2. Vista filtrada exclusivamente para el departamento de 'Accesorios':
 SELECT p.id, p.nombre_producto, c.nombre_categoria, p.stock, p.precio FROM productos p
 INNER JOIN categorias c ON p.categoria_id = c.id WHERE c.nombre_categoria = 'Accesorios';
+
+
+--guia pratica 12 
+
+-- ====================================================================
+-- CONSULTAS DE ESTADÍSTICAS Y MÉTRICAS PARA EL DASHBOARD (Guía 12)
+-- ====================================================================
+
+-- Tarjeta 1: Total de artículos distintos en el catálogo (Muestra variedad de productos)
+SELECT COUNT(id) AS total_productos_catalogo FROM productos;
+
+-- Tarjeta 2: Valor económico total del inventario (Multiplica precio por existencias de cada fila
+y las suma)
+SELECT SUM(precio * stock) AS valor_monetario_inventario FROM productos;
+
+-- Tarjeta 3: Precio del producto estrella o de mayor gama del inventario
+SELECT MAX(precio) AS producto_mas_caro FROM productos
