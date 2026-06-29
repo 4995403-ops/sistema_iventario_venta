@@ -85,6 +85,20 @@ $resultado = $conn->query($sql);
             color: #dc2626; 
             font-weight: bold; 
         }
+
+        /* ¡NUEVO CSS: Estilo para el botón de eliminar! */
+        .btn-eliminar {
+            background-color: #ef4444; 
+            color: white; 
+            padding: 6px 12px;
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            font-weight: bold;
+        }
+        .btn-eliminar:hover { 
+            background-color: #b91c1c; 
+        }
     </style>
 </head>
 <body>
@@ -109,7 +123,7 @@ $resultado = $conn->query($sql);
                 <th>Categoría</th>
                 <th>Stock</th>
                 <th>Precio Unitario</th>
-            </tr>
+                <th>Acciones</th> </tr>
         </thead>
         <tbody>
         <?php
@@ -126,14 +140,21 @@ $resultado = $conn->query($sql);
                     <td> <?php echo $fila['nombre_categoria']; ?> </td>
                     <td class="<?php echo $claseStock; ?>"> <?php echo $fila['stock']; ?> unds. </td>
                     <td> $<?php echo number_format($fila['precio'], 2); ?> </td>
+                    
+                    <td>
+                        <a href="eliminar_producto.php?id=<?php echo $fila['id']; ?>"
+                           class="btn-eliminar"
+                           onclick="return confirm('¿Estás absolutamente seguro de eliminar el producto: <?php echo $fila['nombre_producto']; ?>?');">
+                           🗑️ Eliminar
+                        </a>
+                    </td>
                 </tr>
                 <?php
             } // Fin del bucle while
         } else {
             ?>
             <tr>
-                <td colspan="5" style="text-align:center;">No hay productos registrados en el sistema.</td>
-            </tr>
+                <td colspan="6" style="text-align:center;">No hay productos registrados en el sistema.</td> </tr>
             <?php 
         } 
         ?>
