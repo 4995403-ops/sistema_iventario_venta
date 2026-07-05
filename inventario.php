@@ -9,15 +9,16 @@ if (!isset($_SESSION['user_id'])) {
 // 2. Incluir el puente de conexión a la base de datos
 require_once 'conexion.php';
 
-// 3. Preparar la consulta SQL relacional (Guía 11)
-// Usamos INNER JOIN para mostrar el nombre de la categoría, no su ID numérico
+// 3 y 4. Preparar la consulta SQL relacional
 $sql = "SELECT p.id, p.nombre_producto, c.nombre_categoria, p.stock, p.precio
         FROM productos p
         INNER JOIN categorias c ON p.categoria_id = c.id
         ORDER BY p.id ASC";
 
-// 4. Ejecutar la consulta con MySQLi Orientado a Objetos
-$resultado = $conn->query($sql);
+// ¡AQUÍ ESTÁ LA CORRECCIÓN! Cambiamos $conexion por $conn
+$resultado = $conn->query($sql); 
+
+// Cerramos la etiqueta PHP antes del HTML:
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +87,7 @@ $resultado = $conn->query($sql);
             font-weight: bold; 
         }
 
-        /* ¡NUEVO CSS: Estilo para el botón de eliminar! */
+        /* Estilo para el botón de eliminar */
         .btn-eliminar {
             background-color: #ef4444; 
             color: white; 
@@ -98,6 +99,21 @@ $resultado = $conn->query($sql);
         }
         .btn-eliminar:hover { 
             background-color: #b91c1c; 
+        }
+
+        /* NUEVO: Estilo para el botón de editar */
+        .btn-editar {
+            background-color: #f59e0b; 
+            color: white; 
+            padding: 6px 12px;
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .btn-editar:hover { 
+            background-color: #d97706; 
         }
     </style>
 </head>
@@ -142,6 +158,9 @@ $resultado = $conn->query($sql);
                     <td> $<?php echo number_format($fila['precio'], 2); ?> </td>
                     
                     <td>
+                        <a href="editar_producto.php?id=<?php echo $fila['id']; ?>" class="btn-editar">
+                           ✏️ Editar
+                        </a>
                         <a href="eliminar_producto.php?id=<?php echo $fila['id']; ?>"
                            class="btn-eliminar"
                            onclick="return confirm('¿Estás absolutamente seguro de eliminar el producto: <?php echo $fila['nombre_producto']; ?>?');">
