@@ -1,70 +1,48 @@
 <?php
-// 1. Iniciar el motor de sesiones de PHP
 session_start();
 
-// 2. Incluir la conexión oficial de MySQLi
+// Conectamos a la base de datos usando el archivo limpio de arriba
 require_once 'conexion.php';
 
-// 3. Validar que la información provenga del formulario POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
-    // Obtener y limpiar espacios en blanco de los datos
-    $user = trim($_POST['usuario']);
-    $password = trim($_POST['password']);
+// Capturamos los datos que vienen del formulario
+$usuario_form = $_POST['usuario']; 
+$password_form = $_POST['password'];
 
-    try {
-        // 4. Diseñar la consulta con marcadores de posición (?) para seguridad
-        $sql = "SELECT id, nombre_completo, password, rol FROM usuarios WHERE usuario = ?";
-        
-        // 5. Preparar la sentencia en el servidor
-        $stmt = $conn->prepare($sql);
-        
-        // 6. Vincular el parámetro de usuario como string ("s")
-        $stmt->bind_param("s", $user);
-        
-        // 7. Ejecutar de forma segura
-        $stmt->execute();
-        
-        // Obtener el resultado
-        $result = $stmt->get_result();
+// Preparamos la consulta de forma segura (sin inyección SQL)
+$sql = "SELECT id, nombre_completo, usuario, password, rol FROM usuarios WHERE usuario = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $usuario_form);
+$stmt->execute();
+$resultado = $stmt->get_result();
 
-        // 8. Verificar si encontramos exactamente un usuario
-        if ($result->num_rows === 1) {
-            // Extraer los datos en un arreglo asociativo
-            $row = $result->fetch_assoc();
-            
-            // 9. Validar si la contraseña coincide (Temporalmente en texto plano)
-            if ($password === $row['password']) {
-                
-                // Credenciales correctas: Guardamos datos en la Sesión
-                $_SESSION['user_id'] = $row['id'];
-                $_SESSION['nombre'] = $row['nombre_completo'];
-                $_SESSION['rol'] = $row['rol'];
-                
-                // Redirigir al Dashboard
-                header("Location: test_dashboard.php");
-                exit();
-            } else {
-                // Contraseña incorrecta
-                header("Location: index.php?error=1");
-                exit();
-            }
-        } else {
-            // Usuario no encontrado
-            header("Location: index.php?error=1");
-            exit();
-        }
+// Validamos si encontró al usuario
+if ($resultado->num_rows > 0) {
 
-        // Cerrar la sentencia de forma ordenada
-        $stmt->close();
+    $fila = $resultado->fetch_assoc();
 
-    } catch (mysqli_sql_exception $e) {
-        // Detener el script si hay un fallo crítico de SQL
-        die("Error de autenticación en el servidor: " . $e->getMessage());
+    // Comparamos la contraseña escrita contra el hash guardado en la BD
+    if (password_verify($password_form, $fila['password'])) {
+
+        $_SESSION['user_id'] = $fila['id'];
+        $_SESSION['nombre'] = $fila['nombre_completo'];
+        $_SESSION['rol'] = $fila['rol'];
+
+        header("Location: dashboard.php");
+        exit();
+
+    } else {
+        echo "<script>
+                alert('Credenciales incorrectas. Verifica tu usuario y contraseña.');
+                window.location.href = 'index.php';
+              </script>";
     }
+
 } else {
-    // Si intentan entrar directo a la URL, los devolvemos al Login
-    header("Location: index.php");
-    exit();
+    echo "<script>
+            alert('Credenciales incorrectas. Verifica tu usuario y contraseña.');
+            window.location.href = 'index.php';
+          </script>";
 }
+
+$stmt->close();
 ?>
