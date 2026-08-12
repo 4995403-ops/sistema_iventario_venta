@@ -9,14 +9,31 @@ if (!isset($_SESSION['user_id'])) {
 // 2. Incluir el puente de conexión a la base de datos
 require_once 'conexion.php';
 
-// 3 y 4. Preparar la consulta SQL relacional
-$sql = "SELECT p.id, p.nombre_producto, c.nombre_categoria, p.stock, p.precio
-        FROM productos p
-        INNER JOIN categorias c ON p.categoria_id = c.id
-        ORDER BY p.id ASC";
+// 1. Verificamos si el usuario envió algo por la barra de búsqueda
+$busqueda = isset($_GET['buscar']) ? $_GET['buscar'] : '';
 
-// ¡AQUÍ ESTÁ LA CORRECCIÓN! Cambiamos $conexion por $conn
-$resultado = $conn->query($sql); 
+if ($busqueda != '') {
+    // 2. Si hay búsqueda, preparamos la consulta con LIKE para nombre o categoría
+    $sql = "SELECT p.id, p.nombre_producto, c.nombre_categoria, p.stock, p.precio
+            FROM productos p
+            INNER JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.nombre_producto LIKE ? OR c.nombre_categoria LIKE ?
+            ORDER BY p.id ASC";
+
+    $stmt = $conn->prepare($sql);
+    $param_busqueda = "%" . $busqueda . "%";
+    $stmt->bind_param("ss", $param_busqueda, $param_busqueda);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $stmt->close();
+} else {
+    // 3. Si la barra de búsqueda está vacía, mostramos el inventario normal completo
+    $sql = "SELECT p.id, p.nombre_producto, c.nombre_categoria, p.stock, p.precio
+            FROM productos p
+            INNER JOIN categorias c ON p.categoria_id = c.id
+            ORDER BY p.id ASC";
+    $resultado = $conn->query($sql);
+}
 
 // Cerramos la etiqueta PHP antes del HTML:
 ?>
@@ -101,7 +118,7 @@ $resultado = $conn->query($sql);
             background-color: #b91c1c; 
         }
 
-        /* NUEVO: Estilo para el botón de editar */
+        /* Estilo para el botón de editar */
         .btn-editar {
             background-color: #f59e0b; 
             color: white; 
@@ -114,6 +131,36 @@ $resultado = $conn->query($sql);
         }
         .btn-editar:hover { 
             background-color: #d97706; 
+        }
+
+        /* NUEVO: Estilo para la barra de búsqueda */
+        .busqueda-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .buscador input[type="text"] {
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            width: 250px;
+        }
+        .btn-buscar {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-limpiar {
+            background: #64748b;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -129,6 +176,16 @@ $resultado = $conn->query($sql);
             <span>Usuario: <strong><?php echo $_SESSION['nombre']; ?></strong></span>
             <a href="logout.php" class="btn-salir">Cerrar Sesión</a>
         </div>
+    </div>
+
+    <!-- NUEVO: Barra de Búsqueda -->
+    <div class="busqueda-container">
+        <form method="GET" class="buscador" style="display: flex; gap: 10px;">
+            <input type="text" name="buscar" placeholder="Buscar producto o categoría..."
+                   value="<?php echo isset($_GET['buscar']) ? $_GET['buscar'] : ''; ?>">
+            <button type="submit" class="btn-buscar">🔍 Buscar</button>
+            <a href="inventario.php" class="btn-limpiar">Limpiar</a>
+        </form>
     </div>
 
     <table>
@@ -173,7 +230,10 @@ $resultado = $conn->query($sql);
         } else {
             ?>
             <tr>
-                <td colspan="6" style="text-align:center;">No hay productos registrados en el sistema.</td> </tr>
+                <td colspan="6" style="text-align:center;">
+                    <?php echo ($busqueda != '') ? "No se encontraron productos que coincidan con \"$busqueda\"." : "No hay productos registrados en el sistema."; ?>
+                </td>
+            </tr>
             <?php 
         } 
         ?>
