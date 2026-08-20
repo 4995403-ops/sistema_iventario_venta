@@ -39,8 +39,7 @@ $resultado = $conn->query($sql);
     </div>
 
     <!-- Botón preparado para la próxima clase -->
-    <a href="#" style="background: #3b82f6; color: white; padding: 10px; text-decoration: none; border-radius: 5px; font-weight: bold;">+ Nuevo Proveedor</a>
-
+<a href="#" style="background: #3b82f6; color: white; padding: 10px; text-decoration: none; border-radius: 5px; font-weight: bold;">+ Nuevo Proveedor</a>
     <table>
         <thead>
             <tr>
