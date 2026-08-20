@@ -71,3 +71,26 @@ SELECT SUM(precio * stock) AS valor_monetario_inventario FROM productos;
 
 -- Tarjeta 3: Precio del producto estrella o de mayor gama del inventario
 SELECT MAX(precio) AS producto_mas_caro FROM productos
+-- ====================================================================
+-- MÓDULO DE COMPRAS: ARQUITECTURA MAESTRO-DETALLE (Guía 23)
+-- ====================================================================
+
+CREATE TABLE compras (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  proveedor_id INT NOT NULL,
+  usuario_id INT NOT NULL,
+  fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  total DECIMAL(10, 2) NOT NULL,
+  FOREIGN KEY (proveedor_id) REFERENCES proveedores(id),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
+CREATE TABLE detalle_compras (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  compra_id INT NOT NULL,
+  producto_id INT NOT NULL,
+  cantidad INT NOT NULL,
+  precio_compra DECIMAL(10, 2) NOT NULL,
+  FOREIGN KEY (compra_id) REFERENCES compras(id),
+  FOREIGN KEY (producto_id) REFERENCES productos(id)
+);
