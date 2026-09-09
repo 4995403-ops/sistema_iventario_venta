@@ -70,11 +70,12 @@ $precio_maximo = $fila_caro['max_precio'] ? $fila_caro['max_precio'] : 0;
             <p class="numero">$<?php echo number_format($precio_maximo, 2); ?></p>
         </div>
     </div>
-       <h2 style="color: #334155;">Módulos del Sistema</h2>
+          <h2 style="color: #334155;">Módulos del Sistema</h2>
     <div class="menu-modulos">
         <a href="inventario.php" class="modulo">📦 Ir al Catálogo de Inventario</a>
         <a href="proveedores.php" class="modulo" style="background:#8b5cf6;">🚚 Módulo de Proveedores</a>
-        <a href="nueva_compra.php" class="modulo" style="background:#10b981;">📥 Registrar Ingreso de Mercadería</a>
+        <a href="nuevo_compra.php" class="modulo" style="background:#10b981;">📥 Registrar Ingreso de Mercadería</a>
+        <a href="historial_compras.php" class="modulo" style="background:#1e293b;">📊 Historial de Compras</a>
         <a href="#" class="modulo" style="background:#64748b;">🛒 Punto de Venta (Próximamente)</a>
     </div>
 </body>
